@@ -1,0 +1,45 @@
+body {
+  text-align: center;
+}
+
+#puzzle {
+  display: flex;
+  flex-wrap: wrap;
+  width: 60vh;
+  height: 60vh;
+  margin: 0 auto;
+  background-color: #e7e7eb;
+  border: 1rem ridge #95949a;
+}
+
+.position {
+  width: 20vh;
+  height: 20vh;
+}
+
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  font-size: 3rem;
+  line-height: 20vh;
+  text-align: center;
+  background-color: #38b48b;
+  border: 0.3rem ridge #028760;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin-top: 5vh;
+  font-size: 2rem;
+  color: #250d00;
+  background-color: #89c3eb;
+  border-bottom: solid 7px #192f60;
+  border-radius: 10px;
+}
+
+.btn:active {
+  border-bottom: none;
+  transform: translateY(7px);
+}
