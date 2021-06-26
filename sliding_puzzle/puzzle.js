@@ -1,3 +1,5 @@
+/* global confetti */
+
 const allPositions = Array.from(document.getElementsByClassName('position'));
 const getEmptyPosition = () => allPositions.find((position) => position.innerHTML === '');
 
@@ -27,6 +29,26 @@ for (let i = 0; i < allPositions.length; i += 1) {
     if (adjacentPositions.includes(emptyPosition)) {
       emptyPosition.innerHTML = position.innerHTML;
       position.innerHTML = '';
+    }
+
+    const allPanels = allPositions.map((panel) => panel.innerHTML);
+    const correctPanels = Array.from(allPanels).sort();
+    correctPanels.push(correctPanels.shift());
+
+    if (allPanels.toString() === correctPanels.toString()) {
+      confetti({
+        particleCount: 400,
+        angle: 60,
+        spread: 100,
+        origin: { x: 0, y: 0.6 },
+      });
+
+      confetti({
+        particleCount: 400,
+        angle: 120,
+        spread: 100,
+        origin: { x: 1, y: 0.6 },
+      });
     }
   });
 }
