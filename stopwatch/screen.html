@@ -5,11 +5,27 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="../sanitize.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/e137ba9582.js" crossorigin="anonymous"></script>
   </head>
 
   <body>
     <a class="back_btn" href="../index.html">戻る</a>
-    <div class="header"></div>
+
+    <div class="header">
+      <p id="change-stopwatch">Stopwatch</p>
+
+      <div id="change-btn">
+        <i class="fas fa-toggle-off"></i>
+      </div>
+
+      <p id="change-game">Game</p>
+    </div>
+
+    <div class="game-display-area">
+      <div id="target-time"></div>
+      <div id="time-diff"></div>
+    </div>
+
     <div id="display" class="display">00:00:00.000</div>
 
     <div class="btn-area">
