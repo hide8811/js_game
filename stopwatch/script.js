@@ -8,6 +8,23 @@ let intervalTimer;
 let tmpTime;
 let status = 'zero';
 
+const changeToStartBtn = () => {
+  stop.classList.add('hide-btn');
+  restart.classList.add('hide-btn');
+  start.classList.remove('hide-btn');
+};
+
+const changeToStopBtn = () => {
+  start.classList.add('hide-btn');
+  restart.classList.add('hide-btn');
+  stop.classList.remove('hide-btn');
+};
+
+const changeToRestartBtn = () => {
+  stop.classList.add('hide-btn');
+  restart.classList.remove('hide-btn');
+};
+
 const getTimes = (startTime) => {
   const nowTime = new Date();
   let time = nowTime - startTime;
@@ -39,6 +56,8 @@ const startTimer = () => {
 
     intervalTimer = setInterval(getTimes, 1, startTime);
 
+    changeToStopBtn();
+
     status = 'move';
   }
 };
@@ -46,6 +65,8 @@ const startTimer = () => {
 const stopTimer = () => {
   if (status === 'move') {
     clearInterval(intervalTimer);
+
+    changeToRestartBtn();
 
     status = 'stop';
   }
@@ -58,13 +79,18 @@ const restartTimer = () => {
 
     intervalTimer = setInterval(getTimes, 1, startTime);
 
+    changeToStopBtn();
+
     status = 'move';
   }
 };
 
 const resetTimer = () => {
-  if (status === 'stop') {
+  if (status === 'stop' || status === 'move') {
+    clearInterval(intervalTimer);
     display.innerHTML = '00:00:00.000';
+
+    changeToStartBtn();
 
     status = 'zero';
   }

@@ -43,7 +43,7 @@
 }
 
 .btn {
-  width: 200px;
+  width: 250px;
   height: 100px;
   font-size: 3rem;
   line-height: 100px;
@@ -51,14 +51,8 @@
   border-radius: 50px;
 }
 
-.btn:active {
-  border-bottom: none;
-  transform: translateY(5px);
-}
-
 .start {
   background-color: #88cb7f;
-  border-bottom: solid 5px #6b7b6e;
 }
 
 .start:hover {
@@ -67,7 +61,6 @@
 
 .stop {
   background-color: #d9333f;
-  border-bottom: solid 5px #640125;
 }
 
 .stop:hover {
@@ -76,7 +69,6 @@
 
 .restart {
   background-color: #88cb7f;
-  border-bottom: solid 5px #6b7b6e;
 }
 
 .restart:hover {
@@ -85,9 +77,12 @@
 
 .reset {
   background-color: #ffdb4f;
-  border-bottom: solid 5px #c89932;
 }
 
 .reset:hover {
   background-color: #f2f2b0;
+}
+
+.hide-btn {
+  display: none;
 }
