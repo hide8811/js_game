@@ -53,7 +53,7 @@ const getTimes = (startTime) => {
   const hour = Math.floor(time / 60);
   const hourString = '0'.repeat(2 - String(hour).length) + hour;
 
-  display.innerHTML = `${hourString}:${minutesString}:${secondString}.${millisecondsString}`;
+  display.innerHTML = `${hourString}:${minutesString}:${secondString}.<span class="milliseconds">${millisecondsString}</span>`;
 };
 
 const getGameTimes = (startTime) => {
@@ -70,7 +70,7 @@ const getGameTimes = (startTime) => {
   const second = time % 60;
   const secondString = '0'.repeat(2 - String(second).length) + second;
 
-  display.innerHTML = `${secondString}.${millisecondsString}`;
+  display.innerHTML = `${secondString}.<span class="milliseconds">${millisecondsString}</span>`;
 };
 
 const diffTime = () => {
@@ -92,7 +92,7 @@ const diffTime = () => {
 
   const secondString = String(diff % 60);
 
-  timeDiffArea.innerHTML = `${sign}${secondString}.${millisecondsString}`;
+  timeDiffArea.innerHTML = `${sign}${secondString}.<span class="diff-milliseconds">${millisecondsString}</span>`;
 };
 
 const startTimer = () => {
@@ -143,7 +143,7 @@ const restartTimer = () => {
 
 const resetTimer = () => {
   clearInterval(intervalTimer);
-  display.innerHTML = (mode === 'stopwatch') ? '00:00:00.000' : '00.000';
+  display.innerHTML = (mode === 'stopwatch') ? '00:00:00.<span class="milliseconds">000</span>' : '00.<span class="milliseconds">000</span>';
 
   timeDiffArea.innerHTML = '';
 
@@ -156,8 +156,10 @@ const changeStopwatchMode = () => {
   if (mode === 'game') {
     clearInterval(intervalTimer);
 
-    display.innerHTML = '00:00:00.000';
+    changeStopwatchBtn.classList.replace('off-color', 'on-color');
+    changeGameBtn.classList.replace('on-color', 'off-color');
     changeBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+    display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
     timeDiffArea.innerHTML = '';
     targetTimeArea.innerHTML = '';
 
@@ -171,9 +173,11 @@ const changeGameMode = () => {
   if (mode === 'stopwatch') {
     clearInterval(intervalTimer);
 
-    display.innerHTML = '00.000';
+    changeStopwatchBtn.classList.replace('on-color', 'off-color');
+    changeGameBtn.classList.replace('off-color', 'on-color');
     changeBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
-    targetTimeArea.innerHTML = '10.000';
+    display.innerHTML = '00.<span class="milliseconds">000</span>';
+    targetTimeArea.innerHTML = '10.<span class="target-milliseconds">000</span>';
 
     changeToStartBtn();
     status = 'zero';
