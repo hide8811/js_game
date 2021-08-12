@@ -1,7 +1,11 @@
-const changeBtn = document.getElementById('change-btn');
-const changeStopwatchBtn = document.getElementById('change-stopwatch');
-const changeGameBtn = document.getElementById('change-game');
-const targetTimeArea = document.getElementById('target-time');
+const modeChangeBtn = document.getElementById('mode-change-btn');
+const modeStopwatchBtn = document.getElementById('mode-stopwatch');
+const modeGameBtn = document.getElementById('mode-game');
+const targetChangeArea = document.getElementById('target');
+const targetChangeBtn = document.getElementById('target-change-btn');
+const targetTenBtn = document.getElementById('target-ten');
+const targetRandomBtn = document.getElementById('target-random');
+const targetTime = document.getElementById('target-time');
 const timeDiffArea = document.getElementById('time-diff');
 const display = document.getElementById('display');
 const startBtn = document.getElementById('start');
@@ -13,6 +17,8 @@ let intervalTimer;
 let tmpTime;
 let status = 'zero';
 let mode = 'stopwatch';
+let targetStatus = 'ten';
+let target = 10000;
 
 const changeToStartBtn = () => {
   stopBtn.classList.add('hide-btn');
@@ -73,16 +79,23 @@ const getGameTimes = (startTime) => {
   display.innerHTML = `${secondString}.<span class="milliseconds">${millisecondsString}</span>`;
 };
 
+const getTargetTime = () => {
+  const times = [10000, 9500, 9000, 8500, 8000, 7500, 7000, 6500, 6000, 5500, 5000];
+  const i = Math.floor(Math.random() * 11);
+
+  return times[i];
+};
+
 const diffTime = () => {
   let sign;
   let diff;
 
-  if (tmpTime >= 10000) {
+  if (tmpTime >= target) {
     sign = '+';
-    diff = tmpTime - 10000;
+    diff = tmpTime - target;
   } else {
     sign = '-';
-    diff = 10000 - tmpTime;
+    diff = target - tmpTime;
   }
 
   const milliseconds = diff % 1000;
@@ -103,7 +116,16 @@ const startTimer = () => {
       intervalTimer = setInterval(getTimes, 1, startTime);
     } else {
       timeDiffArea.innerHTML = '';
+
       intervalTimer = setInterval(getGameTimes, 1, startTime);
+
+      if (targetStatus === 'ten') {
+        target = 10000;
+      } else {
+        target = getTargetTime();
+        targetTime.innerHTML = `${Math.floor(target / 1000)}.<span class="target-milliseconds">${String(target).substr(-3)}</span>`;
+      }
+
       display.style.transition = 'opacity 2.9s ease-out 1s';
       display.style.opacity = 0;
     }
@@ -147,44 +169,49 @@ const restartTimer = () => {
 
 const resetTimer = () => {
   clearInterval(intervalTimer);
-  display.innerHTML = (mode === 'stopwatch') ? '00:00:00.<span class="milliseconds">000</span>' : '00.<span class="milliseconds">000</span>';
-
-  timeDiffArea.innerHTML = '';
-
   changeToStartBtn();
+
+  if (mode === 'stopwatch') {
+    display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
+  } else {
+    display.innerHTML = '00.<span class="milliseconds">000</span>';
+    targetTime.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
+    timeDiffArea.innerHTML = '';
+    display.style.transition = '';
+    display.style.opacity = 1;
+  }
 
   status = 'zero';
 };
 
 const changeStopwatchMode = () => {
   if (mode === 'game') {
-    clearInterval(intervalTimer);
+    resetTimer();
 
-    changeStopwatchBtn.classList.replace('off-color', 'on-color');
-    changeGameBtn.classList.replace('on-color', 'off-color');
-    changeBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+    modeStopwatchBtn.classList.replace('off-color', 'on-color');
+    modeGameBtn.classList.replace('on-color', 'off-color');
+    modeChangeBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+
+    targetTime.innerHTML = '';
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
-    timeDiffArea.innerHTML = '';
-    targetTimeArea.innerHTML = '';
+    targetChangeArea.classList.add('hide-target-change');
 
-    changeToStartBtn();
-    status = 'zero';
     mode = 'stopwatch';
   }
 };
 
 const changeGameMode = () => {
   if (mode === 'stopwatch') {
-    clearInterval(intervalTimer);
+    resetTimer();
 
-    changeStopwatchBtn.classList.replace('on-color', 'off-color');
-    changeGameBtn.classList.replace('off-color', 'on-color');
-    changeBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
+    modeStopwatchBtn.classList.replace('on-color', 'off-color');
+    modeGameBtn.classList.replace('off-color', 'on-color');
+    modeChangeBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
+
     display.innerHTML = '00.<span class="milliseconds">000</span>';
-    targetTimeArea.innerHTML = '10.<span class="target-milliseconds">000</span>';
+    targetTime.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
+    targetChangeArea.classList.remove('hide-target-change');
 
-    changeToStartBtn();
-    status = 'zero';
     mode = 'game';
   }
 };
@@ -197,9 +224,42 @@ const modeChange = () => {
   }
 };
 
-changeBtn.addEventListener('click', modeChange);
-changeStopwatchBtn.addEventListener('click', changeStopwatchMode);
-changeGameBtn.addEventListener('click', changeGameMode);
+const changeTargetTen = () => {
+  resetTimer();
+
+  targetTenBtn.classList.replace('off-color', 'on-color');
+  targetRandomBtn.classList.replace('on-color', 'off-color');
+  targetChangeBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+  targetTime.innerHTML = '10.<span class="target-milliseconds">000</span>';
+
+  targetStatus = 'ten';
+};
+
+const changeTargetRandom = () => {
+  resetTimer();
+
+  targetTenBtn.classList.replace('on-color', 'off-color');
+  targetRandomBtn.classList.replace('off-color', 'on-color');
+  targetChangeBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
+  targetTime.innerHTML = '<span class="target-time-random">RANDOM</span>';
+
+  targetStatus = 'random';
+};
+
+const targetChange = () => {
+  if (targetStatus === 'ten') {
+    changeTargetRandom();
+  } else {
+    changeTargetTen();
+  }
+};
+
+modeChangeBtn.addEventListener('click', modeChange);
+modeStopwatchBtn.addEventListener('click', changeStopwatchMode);
+modeGameBtn.addEventListener('click', changeGameMode);
+targetChangeBtn.addEventListener('click', targetChange);
+targetTenBtn.addEventListener('click', changeTargetTen);
+targetRandomBtn.addEventListener('click', changeTargetRandom);
 startBtn.addEventListener('mousedown', startTimer);
 stopBtn.addEventListener('mousedown', stopTimer);
 restartBtn.addEventListener('mousedown', restartTimer);

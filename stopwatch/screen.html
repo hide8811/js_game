@@ -12,13 +12,25 @@
     <a class="back_btn" href="../index.html">戻る</a>
 
     <div class="header">
-      <p id="change-stopwatch" class="change-stopwatch on-color">Stopwatch</p>
+      <div class="mode">
+        <p id="mode-stopwatch" class="mode-stopwatch on-color">Stopwatch</p>
 
-      <div id="change-btn" class="change-btn">
-        <i class="fas fa-toggle-off"></i>
+        <div id="mode-change-btn" class="mode-change-btn">
+          <i class="fas fa-toggle-off"></i>
+        </div>
+
+        <p id="mode-game" class="mode-game off-color">Stop Game</p>
       </div>
 
-      <p id="change-game" class="change-game off-color">Game</p>
+      <div id="target" class="target hide-target-change">
+        <div id="target-ten" class="target-ten on-color">10.<span class="target-ten-milliseconds">000</span></div>
+
+        <div id="target-change-btn" class="target-change-btn">
+          <i class="fas fa-toggle-off"></i>
+        </div>
+
+        <div id="target-random" class="target-random off-color">Random</div>
+      </div>
     </div>
 
     <div class="game-display-area">

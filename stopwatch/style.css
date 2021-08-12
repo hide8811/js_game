@@ -17,26 +17,58 @@
   background-color: #d8e698;
 }
 
-.header {
+.mode {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  height: 150px;
   font-size: 2rem;
 }
 
-.change-stopwatch {
-  width: 200px;
+.mode-stopwatch {
+  width: calc(50vw - 24px);
   text-align: end;
 }
 
-.change-btn {
-  margin: 0 10px;
+.mode-change-btn {
+  width: 48px;
   color: #005243;
+  text-align: center;
 }
 
-.change-game {
-  width: 110px;
+.mode-game {
+  width: calc(50vw - 24px);
+}
+
+.target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  font-size: 1.5rem;
+}
+
+.hide-target-change {
+  visibility: hidden;
+}
+
+.target-ten {
+  width: calc(50vw - 20px);
+  text-align: end;
+}
+
+.target-ten-milliseconds {
+  font-size: 1rem;
+}
+
+.target-change-btn {
+  width: 40px;
+  color: #005243;
+  text-align: center;
+}
+
+.target-random {
+  width: calc(50vw - 20px);
 }
 
 .on-color {
@@ -56,27 +88,29 @@
 }
 
 .target-time {
-  width: 300px;
-  height: 100px;
-  margin-right: 150px;
+  width: 50vw;
+  height: 120px;
   font-size: 4rem;
   font-weight: bold;
   line-height: 100px;
   color: #1e50a2;
-  text-align: center;
+  text-align: end;
 }
 
 .target-milliseconds {
   font-size: 2.7rem;
 }
 
+.target-time-random {
+  font-size: 2rem;
+}
+
 .time-diff {
-  width: 200px;
-  height: 100px;
+  width: 50vw;
+  padding-left: 20px;
   font-size: 3rem;
   line-height: 100px;
   color: #c9171e;
-  text-align: end;
 }
 
 .diff-milliseconds {
