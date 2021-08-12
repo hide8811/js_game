@@ -104,6 +104,8 @@ const startTimer = () => {
     } else {
       timeDiffArea.innerHTML = '';
       intervalTimer = setInterval(getGameTimes, 1, startTime);
+      display.style.transition = 'opacity 2.9s ease-out 1s';
+      display.style.opacity = 0;
     }
 
     changeToStopBtn();
@@ -121,6 +123,8 @@ const stopTimer = () => {
       status = 'stop';
     } else {
       diffTime();
+      display.style.transition = '';
+      display.style.opacity = 1;
 
       changeToStartBtn();
       status = 'zero';
