@@ -20,6 +20,12 @@ JavaScript の学習・アウトプットのため。
 - JavaScript
 - HEROKU
 
+動作確認ブラウザ
+
+ - Google Chrome
+ - Microsoft Edge
+ - Safari
+
 ## 内容
 
 <span id="sliding_puzzle"></span>
