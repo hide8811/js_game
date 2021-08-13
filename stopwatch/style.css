@@ -48,10 +48,6 @@
   font-size: 1.5rem;
 }
 
-.hide-target-change {
-  visibility: hidden;
-}
-
 .target-ten {
   width: calc(50vw - 20px);
   text-align: end;
@@ -107,7 +103,7 @@
 
 .time-diff {
   width: 50vw;
-  padding-left: 20px;
+  padding-left: 50px;
   font-size: 3rem;
   line-height: 100px;
   color: #c9171e;
@@ -185,4 +181,52 @@
 
 .hide-btn {
   display: none;
+}
+
+.score {
+  width: 500px;
+  height: 600px;
+  padding: 10px 50px;
+  margin: 30px auto;
+  overflow: scroll;
+  border: solid 8px #2c4f54;
+  border-radius: 50px;
+}
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  margin: 0 auto 10px;
+  line-height: 50px;
+  list-style: none;
+  border-bottom: solid 4px #2c4f54;
+}
+
+.score-target {
+  display: inline-block;
+  width: calc(100% / 3);
+  padding-left: 10px;
+  font-size: 1.5rem;
+  color: #1e50a2;
+}
+
+.score-time {
+  display: inline-block;
+  width: calc(100% / 3);
+  font-size: 2rem;
+  text-align: center;
+}
+
+.score-diff {
+  display: inline-block;
+  width: calc(100% / 3);
+  padding-right: 10px;
+  font-size: 1.5rem;
+  color: #c9171e;
+  text-align: end;
+}
+
+.hide-content {
+  visibility: hidden;
 }

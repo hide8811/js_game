@@ -5,20 +5,75 @@ const targetChangeArea = document.getElementById('target');
 const targetChangeBtn = document.getElementById('target-change-btn');
 const targetTenBtn = document.getElementById('target-ten');
 const targetRandomBtn = document.getElementById('target-random');
-const targetTime = document.getElementById('target-time');
+const targetTimeDisplay = document.getElementById('target-time');
 const timeDiffArea = document.getElementById('time-diff');
 const display = document.getElementById('display');
 const startBtn = document.getElementById('start');
 const stopBtn = document.getElementById('stop');
 const restartBtn = document.getElementById('restart');
 const resetBtn = document.getElementById('reset');
+const scoreArea = document.getElementById('score');
 
 let intervalTimer;
 let tmpTime;
+let tmpSignDiff = { sign: '+', time: '0' };
 let status = 'zero';
 let mode = 'stopwatch';
 let targetStatus = 'ten';
 let target = 10000;
+let scores = []; // { target: target, time: tmpTime, diff: tmpSignDiff }
+
+// 参考: https://developer.mozilla.org/ja/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
+function storageAvailable() {
+  try {
+    const x = '__storage_test__';
+    localStorage.setItem(x, x);
+    localStorage.removeItem(x);
+    return true;
+  } catch (e) {
+    return e instanceof DOMException && (
+      // everything except Firefox
+      e.code === 22
+      // Firefox
+      || e.code === 1014
+      // test name field too, because code might not be present
+      // everything except Firefox
+      || e.name === 'QuotaExceededError'
+      // Firefox
+      || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+      // acknowledge QuotaExceededError only if there's something already stored
+      && (localStorage && localStorage.length !== 0);
+  }
+}
+
+const localStorageAvailable = storageAvailable();
+
+const createTimeHash = (num) => {
+  let time = num;
+
+  const milliseconds = time % 1000;
+  const millisecondsString = '0'.repeat(3 - String(milliseconds).length) + milliseconds;
+
+  time = Math.floor(time / 1000);
+
+  const second = time % 60;
+  const secondString = '0'.repeat(2 - String(second).length) + second;
+
+  time = Math.floor(time / 60);
+
+  const minutes = time % 60;
+  const minutesString = '0'.repeat(2 - String(minutes).length) + minutes;
+
+  const hour = Math.floor(time / 60);
+  const hourString = '0'.repeat(2 - String(hour).length) + hour;
+
+  return {
+    hour: hourString,
+    minutes: minutesString,
+    second: secondString,
+    milliseconds: millisecondsString,
+  };
+};
 
 const changeToStartBtn = () => {
   stopBtn.classList.add('hide-btn');
@@ -37,32 +92,18 @@ const changeToRestartBtn = () => {
   restartBtn.classList.remove('hide-btn');
 };
 
-const getTimes = (startTime) => {
+const timeDisplay = (startTime) => {
   const nowTime = new Date();
-  let time = nowTime - startTime;
+  const elapsedTime = nowTime - startTime;
 
-  tmpTime = time;
+  tmpTime = elapsedTime;
 
-  const milliseconds = time % 1000;
-  const millisecondsString = '0'.repeat(3 - String(milliseconds).length) + milliseconds;
+  const time = createTimeHash(elapsedTime);
 
-  time = Math.floor(time / 1000);
-
-  const second = time % 60;
-  const secondString = '0'.repeat(2 - String(second).length) + second;
-
-  time = Math.floor(time / 60);
-
-  const minutes = time % 60;
-  const minutesString = '0'.repeat(2 - String(minutes).length) + minutes;
-
-  const hour = Math.floor(time / 60);
-  const hourString = '0'.repeat(2 - String(hour).length) + hour;
-
-  display.innerHTML = `${hourString}:${minutesString}:${secondString}.<span class="milliseconds">${millisecondsString}</span>`;
+  display.innerHTML = `${time.hour}:${time.minutes}:${time.second}.<span class="milliseconds">${time.milliseconds}</span>`;
 };
 
-const getGameTimes = (startTime) => {
+const gameTimeDisplay = (startTime) => {
   const nowTime = new Date();
   let time = nowTime - startTime;
 
@@ -90,7 +131,10 @@ const diffTime = () => {
   let sign;
   let diff;
 
-  if (tmpTime >= target) {
+  if (tmpTime === target) {
+    sign = '±';
+    diff = 0;
+  } else if (tmpTime > target) {
     sign = '+';
     diff = tmpTime - target;
   } else {
@@ -98,14 +142,34 @@ const diffTime = () => {
     diff = target - tmpTime;
   }
 
-  const milliseconds = diff % 1000;
-  const millisecondsString = '0'.repeat(3 - String(milliseconds).length) + milliseconds;
+  tmpSignDiff = { sign, time: diff };
 
-  diff = Math.floor(diff / 1000);
+  const time = createTimeHash(diff);
 
-  const secondString = String(diff % 60);
+  timeDiffArea.innerHTML = `${sign}${time.second}.<span class="diff-milliseconds">${time.milliseconds}</span>`;
+};
 
-  timeDiffArea.innerHTML = `${sign}${secondString}.<span class="diff-milliseconds">${millisecondsString}</span>`;
+const addScore = () => {
+  const li = document.createElement('li');
+  li.className = 'score-item';
+  const targetTime = createTimeHash(target);
+  const time = createTimeHash(tmpTime);
+  const timeDiff = createTimeHash(tmpSignDiff.time);
+
+  li.innerHTML = `<span class="score-target">${targetTime.second}.${targetTime.milliseconds}</span><span class="score-time">${time.second}.${time.milliseconds}</span><span class="score-diff">${tmpSignDiff.sign}${timeDiff.second}.${timeDiff.milliseconds}</span>`;
+
+  scoreArea.insertBefore(li, scoreArea.firstChild);
+
+  if (localStorageAvailable) {
+    scores.push({ target, time: tmpTime, diff: tmpSignDiff });
+
+    if (scores.length > 100) {
+      scores.shift();
+      scoreArea.lastChild.remove();
+    }
+
+    localStorage.setItem('stopwatchGameScore', JSON.stringify(scores));
+  }
 };
 
 const startTimer = () => {
@@ -113,17 +177,18 @@ const startTimer = () => {
     const startTime = new Date();
 
     if (mode === 'stopwatch') {
-      intervalTimer = setInterval(getTimes, 1, startTime);
+      intervalTimer = setInterval(timeDisplay, 1, startTime);
     } else {
       timeDiffArea.innerHTML = '';
 
-      intervalTimer = setInterval(getGameTimes, 1, startTime);
+      intervalTimer = setInterval(gameTimeDisplay, 1, startTime);
 
       if (targetStatus === 'ten') {
         target = 10000;
       } else {
         target = getTargetTime();
-        targetTime.innerHTML = `${Math.floor(target / 1000)}.<span class="target-milliseconds">${String(target).substr(-3)}</span>`;
+        const time = createTimeHash(target);
+        targetTimeDisplay.innerHTML = `${time.second}.<span class="target-milliseconds">${time.milliseconds}</span>`;
       }
 
       display.style.transition = 'opacity 2.9s ease-out 1s';
@@ -148,6 +213,8 @@ const stopTimer = () => {
       display.style.transition = '';
       display.style.opacity = 1;
 
+      addScore();
+
       changeToStartBtn();
       status = 'zero';
     }
@@ -159,7 +226,7 @@ const restartTimer = () => {
     const startTime = new Date();
     startTime.setMilliseconds(startTime.getMilliseconds() - tmpTime);
 
-    intervalTimer = setInterval(getTimes, 1, startTime);
+    intervalTimer = setInterval(timeDisplay, 1, startTime);
 
     changeToStopBtn();
 
@@ -175,7 +242,7 @@ const resetTimer = () => {
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
   } else {
     display.innerHTML = '00.<span class="milliseconds">000</span>';
-    targetTime.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
+    targetTimeDisplay.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
     timeDiffArea.innerHTML = '';
     display.style.transition = '';
     display.style.opacity = 1;
@@ -192,9 +259,10 @@ const changeStopwatchMode = () => {
     modeGameBtn.classList.replace('on-color', 'off-color');
     modeChangeBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
 
-    targetTime.innerHTML = '';
+    targetTimeDisplay.innerHTML = '';
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
-    targetChangeArea.classList.add('hide-target-change');
+    targetChangeArea.classList.add('hide-content');
+    scoreArea.classList.add('hide-content');
 
     mode = 'stopwatch';
   }
@@ -209,8 +277,9 @@ const changeGameMode = () => {
     modeChangeBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
 
     display.innerHTML = '00.<span class="milliseconds">000</span>';
-    targetTime.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
-    targetChangeArea.classList.remove('hide-target-change');
+    targetTimeDisplay.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
+    targetChangeArea.classList.remove('hide-content');
+    scoreArea.classList.remove('hide-content');
 
     mode = 'game';
   }
@@ -230,7 +299,7 @@ const changeTargetTen = () => {
   targetTenBtn.classList.replace('off-color', 'on-color');
   targetRandomBtn.classList.replace('on-color', 'off-color');
   targetChangeBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
-  targetTime.innerHTML = '10.<span class="target-milliseconds">000</span>';
+  targetTimeDisplay.innerHTML = '10.<span class="target-milliseconds">000</span>';
 
   targetStatus = 'ten';
 };
@@ -241,7 +310,7 @@ const changeTargetRandom = () => {
   targetTenBtn.classList.replace('on-color', 'off-color');
   targetRandomBtn.classList.replace('off-color', 'on-color');
   targetChangeBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
-  targetTime.innerHTML = '<span class="target-time-random">RANDOM</span>';
+  targetTimeDisplay.innerHTML = '<span class="target-time-random">RANDOM</span>';
 
   targetStatus = 'random';
 };
@@ -264,3 +333,24 @@ startBtn.addEventListener('mousedown', startTimer);
 stopBtn.addEventListener('mousedown', stopTimer);
 restartBtn.addEventListener('mousedown', restartTimer);
 resetBtn.addEventListener('mousedown', resetTimer);
+
+if (localStorageAvailable) {
+  const dataJson = localStorage.getItem('stopwatchGameScore');
+
+  if (dataJson) {
+    const dataArray = JSON.parse(dataJson);
+
+    dataArray.forEach((data) => {
+      const li = document.createElement('li');
+      li.className = 'score-item';
+      const targetTime = createTimeHash(data.target);
+      const time = createTimeHash(data.time);
+      const timeDiff = createTimeHash(data.diff.time);
+
+      li.innerHTML = `<span class="score-target">${targetTime.second}.${targetTime.milliseconds}</span><span class="score-time">${time.second}.${time.milliseconds}</span><span class="score-diff">${data.diff.sign}${timeDiff.second}.${timeDiff.milliseconds}</span>`;
+
+      scoreArea.insertBefore(li, scoreArea.firstChild);
+    });
+    scores = dataArray;
+  }
+}
