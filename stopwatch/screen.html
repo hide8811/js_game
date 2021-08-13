@@ -5,12 +5,40 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="../sanitize.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/e137ba9582.js" crossorigin="anonymous"></script>
   </head>
 
   <body>
     <a class="back_btn" href="../index.html">戻る</a>
-    <div class="header"></div>
-    <div id="display" class="display">00:00:00.000</div>
+
+    <div class="header">
+      <div class="mode">
+        <p id="mode-stopwatch" class="mode-stopwatch on-color">Stopwatch</p>
+
+        <div id="mode-change-btn" class="mode-change-btn">
+          <i class="fas fa-toggle-off"></i>
+        </div>
+
+        <p id="mode-game" class="mode-game off-color">Stop Game</p>
+      </div>
+
+      <div id="target" class="target hide-content">
+        <div id="target-ten" class="target-ten on-color">10.<span class="target-ten-milliseconds">000</span></div>
+
+        <div id="target-change-btn" class="target-change-btn">
+          <i class="fas fa-toggle-off"></i>
+        </div>
+
+        <div id="target-random" class="target-random off-color">Random</div>
+      </div>
+    </div>
+
+    <div class="game-display-area">
+      <div id="target-time" class="target-time"></div>
+      <div id="time-diff" class="time-diff"></div>
+    </div>
+
+    <div id="display" class="display">00:00:00.<span class="milliseconds">000</span></div>
 
     <div class="btn-area">
       <div id="left-btn" class="left-btn">
@@ -23,6 +51,8 @@
         <button id="reset" class="reset btn">RESET</button>
       </div>
     </div>
+
+    <ul id="score" class="score hide-content"></ul>
 
     <script type="text/javascript" src="script.js"></script>
   </body>
