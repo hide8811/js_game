@@ -2,6 +2,30 @@ body {
   text-align: center;
 }
 
+.back_btn {
+  position: absolute;
+  top: 3vh;
+  left: 8vw;
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  font-size: 1.5rem;
+  line-height: 50px;
+  color: #281a14;
+  text-decoration: none;
+  background-color: #88cb7f;
+  border-bottom: solid 4px #6b7b6e;
+  border-radius: 10px;
+}
+
+.back_btn:hover {
+  background-color: #d8e698;
+}
+
+.back_btn:active {
+  border-bottom: none;
+  transform: translateY(4px);
+}
+
 #puzzle {
   display: flex;
   flex-wrap: wrap;
@@ -37,6 +61,10 @@ body {
   background-color: #89c3eb;
   border-bottom: solid 7px #192f60;
   border-radius: 10px;
+}
+
+.btn:hover {
+  background-color: #c1e4e9;
 }
 
 .btn:active {

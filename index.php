@@ -1,1 +1,1 @@
-<?php include_once('sliding_puzzle/screen.html'); ?>
+<?php include_once('index.html'); ?>
