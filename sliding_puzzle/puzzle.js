@@ -2,58 +2,62 @@
 
 const allPositions = Array.from(document.getElementsByClassName('position'));
 const getEmptyPosition = () => allPositions.find((position) => position.innerHTML === '');
-
-for (let i = 0; i < allPositions.length; i += 1) {
-  allPositions[i].addEventListener('click', (event) => {
-    const position = event.currentTarget;
-
-    const leftColumn = ['position1', 'position4', 'position7'];
-    const rightColumn = ['position3', 'position6', 'position9'];
-
-    const up = i - 3;
-    const down = i + 3;
-    const left = i - 1;
-    const right = i + 1;
-
-    const adjacent = () => {
-      if (leftColumn.includes(position.id)) { return [up, down, right]; }
-
-      if (rightColumn.includes(position.id)) { return [up, down, left]; }
-
-      return [up, down, left, right];
-    };
-
-    const adjacentPositions = adjacent().map((a) => allPositions[a]);
-    const emptyPosition = getEmptyPosition();
-
-    if (adjacentPositions.includes(emptyPosition)) {
-      emptyPosition.innerHTML = position.innerHTML;
-      position.innerHTML = '';
-    }
-
-    const allPanels = allPositions.map((panel) => panel.innerHTML);
-    const correctPanels = Array.from(allPanels).sort();
-    correctPanels.push(correctPanels.shift());
-
-    if (allPanels.toString() === correctPanels.toString()) {
-      confetti({
-        particleCount: 400,
-        angle: 60,
-        spread: 100,
-        origin: { x: 0, y: 0.6 },
-      });
-
-      confetti({
-        particleCount: 400,
-        angle: 120,
-        spread: 100,
-        origin: { x: 1, y: 0.6 },
-      });
-    }
-  });
-}
-
 const shuffleBtn = document.getElementById('shuffle-btn');
+
+let completedFlag = false;
+
+// 参考: https://www.npmjs.com/package/canvas-confetti
+const canvasConfetti = () => {
+  confetti({
+    particleCount: 400,
+    angle: 60,
+    spread: 100,
+    origin: { x: 0, y: 0.6 },
+  });
+
+  confetti({
+    particleCount: 400,
+    angle: 120,
+    spread: 100,
+    origin: { x: 1, y: 0.6 },
+  });
+};
+
+const slide = (event, i) => {
+  const position = event.currentTarget;
+
+  const leftColumn = ['position1', 'position4', 'position7'];
+  const rightColumn = ['position3', 'position6', 'position9'];
+
+  const up = i - 3;
+  const down = i + 3;
+  const left = i - 1;
+  const right = i + 1;
+
+  const adjacent = () => {
+    if (leftColumn.includes(position.id)) { return [up, down, right]; }
+
+    if (rightColumn.includes(position.id)) { return [up, down, left]; }
+
+    return [up, down, left, right];
+  };
+
+  const adjacentPositions = adjacent().map((a) => allPositions[a]);
+  const emptyPosition = getEmptyPosition();
+
+  if (adjacentPositions.includes(emptyPosition)) {
+    emptyPosition.innerHTML = position.innerHTML;
+    position.innerHTML = '';
+  }
+
+  const allPanels = allPositions.map((panel) => panel.innerHTML);
+  const correctPanels = Array.from(allPanels).sort();
+  correctPanels.push(correctPanels.shift());
+
+  if (completedFlag && allPanels.toString() === correctPanels.toString()) {
+    canvasConfetti();
+  }
+};
 
 const possible = (allPanels) => {
   const swapEven = () => {
@@ -90,7 +94,7 @@ const possible = (allPanels) => {
   return true;// 繰り返し
 };
 
-shuffleBtn.addEventListener('click', () => {
+const shuffle = () => {
   const allPanels = allPositions.map((position) => position.innerHTML);
 
   do {
@@ -105,4 +109,14 @@ shuffleBtn.addEventListener('click', () => {
   for (let i = 0; i < allPositions.length; i += 1) {
     allPositions[i].innerHTML = allPanels[i];
   }
-});
+
+  completedFlag = true;
+};
+
+for (let i = 0; i < allPositions.length; i += 1) {
+  allPositions[i].addEventListener('click', (event) => {
+    slide(event, i);
+  });
+}
+
+shuffleBtn.addEventListener('click', shuffle);
