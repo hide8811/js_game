@@ -179,11 +179,7 @@
   background-color: #f2f2b0;
 }
 
-.hide-btn {
-  display: none;
-}
-
-.score {
+.bottom-display {
   width: 500px;
   height: 600px;
   padding: 10px 50px;
@@ -227,6 +223,40 @@
   text-align: end;
 }
 
-.hide-content {
+.record-item {
+  height: 50px;
+  margin: 0 auto 10px;
+  line-height: 50px;
+  list-style: none;
+  border-bottom: solid 4px #2c4f54;
+}
+
+.record-title {
+  border-bottom: double 6px #2c4f54;
+}
+
+.lap-record {
+  display: inline-block;
+  width: calc(100% / 2);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.split-record {
+  display: inline-block;
+  width: calc(100% / 2);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.hide {
+  display: none;
+}
+
+.invisible {
   visibility: hidden;
+}
+
+ul {
+  padding: 0;
 }

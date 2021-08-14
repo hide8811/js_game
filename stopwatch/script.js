@@ -14,6 +14,7 @@ const restartBtn = document.getElementById('restart');
 const resetBtn = document.getElementById('reset');
 const lapBtn = document.getElementById('lap');
 const scoreArea = document.getElementById('score');
+const recordTitle = document.getElementById('record-title');
 const recordArea = document.getElementById('record');
 
 let intervalTimer;
@@ -25,6 +26,7 @@ let mode = 'stopwatch';
 let targetStatus = 'ten';
 let target = 10000;
 let scores = []; // { target: target, time: nowTime, diff: signDiff }
+let record = [];
 
 // 参考: https://developer.mozilla.org/ja/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
 function storageAvailable() {
@@ -79,20 +81,20 @@ const createTimeHash = (num) => {
 };
 
 const changeToStartBtn = () => {
-  stopBtn.classList.add('hide-btn');
-  restartBtn.classList.add('hide-btn');
-  startBtn.classList.remove('hide-btn');
+  stopBtn.classList.add('hide');
+  restartBtn.classList.add('hide');
+  startBtn.classList.remove('hide');
 };
 
 const changeToStopBtn = () => {
-  startBtn.classList.add('hide-btn');
-  restartBtn.classList.add('hide-btn');
-  stopBtn.classList.remove('hide-btn');
+  startBtn.classList.add('hide');
+  restartBtn.classList.add('hide');
+  stopBtn.classList.remove('hide');
 };
 
 const changeToRestartBtn = () => {
-  stopBtn.classList.add('hide-btn');
-  restartBtn.classList.remove('hide-btn');
+  stopBtn.classList.add('hide');
+  restartBtn.classList.remove('hide');
 };
 
 const changeToLapBtn = () => {
@@ -176,6 +178,27 @@ const addScore = () => {
   }
 };
 
+const lapTimer = () => {
+  if (mode === 'stopwatch' && status === 'move') {
+    const lap = nowTime - lastTime;
+    const lapTime = createTimeHash(lap);
+    const splitTime = createTimeHash(nowTime);
+
+    const lapTimeStr = `${lapTime.hour}:${lapTime.minutes}:${lapTime.second}.${lapTime.milliseconds}`;
+    const splitTimeStr = `${splitTime.hour}:${splitTime.minutes}:${splitTime.second}.${splitTime.milliseconds}`;
+
+    const li = document.createElement('li');
+    li.className = 'record-item';
+    li.innerHTML = `<span class="lap-record">${lapTimeStr}</span><span class="split-record">${splitTimeStr}</span>`;
+
+    recordArea.appendChild(li);
+
+    record.push([lapTimeStr, splitTimeStr]);
+    console.log(record);
+    lastTime = nowTime;
+  }
+};
+
 const startTimer = () => {
   if (status === 'zero') {
     const startTime = new Date();
@@ -210,6 +233,7 @@ const stopTimer = () => {
     clearInterval(intervalTimer);
 
     if (mode === 'stopwatch') {
+      if (record.length > 0) lapTimer();
       changeToRestartBtn();
       status = 'stop';
     } else {
@@ -246,6 +270,8 @@ const resetTimer = () => {
 
   if (mode === 'stopwatch') {
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
+    recordArea.innerHTML = '';
+    record = [];
     lastTime = 0;
   } else {
     display.innerHTML = '00.<span class="milliseconds">000</span>';
@@ -258,22 +284,6 @@ const resetTimer = () => {
   status = 'zero';
 };
 
-const lapTimer = () => {
-  if (mode === 'stopwatch' && status === 'move') {
-    const lap = nowTime - lastTime;
-    const lapTime = createTimeHash(lap);
-    const splitTime = createTimeHash(nowTime);
-
-    const lapTimeStr = `${lapTime.hour}:${lapTime.minutes}:${lapTime.second}.${lapTime.milliseconds}`;
-    const splitTimeStr = `${splitTime.hour}:${splitTime.minutes}:${splitTime.second}.${splitTime.milliseconds}`;
-
-    console.log(lapTimeStr);
-    console.log(splitTimeStr);
-
-    lastTime = nowTime;
-  }
-};
-
 const changeStopwatchMode = () => {
   if (mode === 'game') {
     resetTimer();
@@ -284,8 +294,12 @@ const changeStopwatchMode = () => {
 
     targetTimeDisplay.innerHTML = '';
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
-    targetChangeArea.classList.add('hide-content');
-    scoreArea.classList.add('hide-content');
+    targetChangeArea.classList.add('invisible');
+    scoreArea.classList.add('invisible');
+
+    scoreArea.classList.add('hide');
+    recordTitle.classList.remove('hide');
+    recordArea.classList.remove('hide');
 
     mode = 'stopwatch';
   }
@@ -301,8 +315,12 @@ const changeGameMode = () => {
 
     display.innerHTML = '00.<span class="milliseconds">000</span>';
     targetTimeDisplay.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
-    targetChangeArea.classList.remove('hide-content');
-    scoreArea.classList.remove('hide-content');
+    targetChangeArea.classList.remove('invisible');
+    scoreArea.classList.remove('invisible');
+
+    recordTitle.classList.add('hide');
+    recordArea.classList.add('hide');
+    scoreArea.classList.remove('hide');
 
     mode = 'game';
   }
