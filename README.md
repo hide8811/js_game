@@ -22,9 +22,9 @@ JavaScript の学習・アウトプットのため。
 
 動作確認ブラウザ
 
- - Google Chrome
- - Microsoft Edge
- - Safari
+ - Google Chrome　ver.92
+ - Microsoft Edge ver.92
+ - Safari ver.14
 
 ## 内容
 
