@@ -16,6 +16,7 @@ const lapBtn = document.getElementById('lap');
 const scoreArea = document.getElementById('score');
 const recordTitle = document.getElementById('record-title');
 const recordArea = document.getElementById('record');
+const downloadCsvBtn = document.getElementById('download-csv');
 
 let intervalTimer;
 let nowTime;
@@ -201,7 +202,6 @@ const lapTimer = () => {
     recordArea.appendChild(li);
 
     record.push([lapTimeStr, splitTimeStr]);
-    console.log(record);
     lastTime = nowTime;
   }
 };
@@ -374,6 +374,25 @@ const targetChange = () => {
   }
 };
 
+const downloadCSV = () => {
+  if (record.length > 0) {
+    const fileName = 'stopwatch.csv';
+    const header = ',Lap Time,Split Time\n';
+    const data = header + record.map((r, i) => `${i + 1},${r.join(',')}`).join('\n');
+
+    const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+    const blob = new Blob([bom, data], { type: 'text/csv' });
+
+    const download = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    download.href = url;
+    download.download = fileName;
+    download.click();
+
+    URL.revokeObjectURL(url);
+  }
+};
+
 modeChangeBtn.addEventListener('click', modeChange);
 modeStopwatchBtn.addEventListener('click', changeStopwatchMode);
 modeGameBtn.addEventListener('click', changeGameMode);
@@ -385,6 +404,7 @@ stopBtn.addEventListener('mousedown', stopTimer);
 restartBtn.addEventListener('mousedown', restartTimer);
 resetBtn.addEventListener('mousedown', resetTimer);
 lapBtn.addEventListener('mousedown', lapTimer);
+downloadCsvBtn.addEventListener('click', downloadCSV);
 
 if (localStorageAvailable) {
   const dataJson = localStorage.getItem('stopwatchGameScore');

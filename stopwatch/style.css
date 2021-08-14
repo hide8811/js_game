@@ -1,4 +1,8 @@
-.back_btn {
+ul {
+  padding: 0;
+}
+
+.back-btn {
   position: absolute;
   top: 3vh;
   left: 8vw;
@@ -13,7 +17,7 @@
   border-radius: 10px;
 }
 
-.back_btn:hover {
+.back-btn:hover {
   background-color: #d8e698;
 }
 
@@ -257,14 +261,25 @@
   text-align: center;
 }
 
+.download-csv {
+  display: block;
+  width: 200px;
+  height: 80px;
+  margin: 50px auto;
+  font-size: 1.5rem;
+  background-color: #88cb7f;
+  border-bottom: solid 4px #6b7b6e;
+  border-radius: 50px;
+}
+
+.download-csv:hover {
+  background-color: #d8e698;
+}
+
 .hide {
   display: none;
 }
 
 .invisible {
   visibility: hidden;
-}
-
-ul {
-  padding: 0;
 }
