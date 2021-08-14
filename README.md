@@ -45,11 +45,14 @@ JavaScript の学習・アウトプットのため。
 ゲームは10秒で止めるパターンと、ランダムで止めるパターンがあります。
 ゲームの記録を100件、localStorageに保存できるようになっています。<br>
 
-ストップウォッチ機能
-![stopwatch](https://user-images.githubusercontent.com/65598351/129337340-1f3ea665-a3c4-458e-ad76-7310e3027cf2.gif)
+ストップウォッチ機能<br>
+![stopwatch](https://user-images.githubusercontent.com/65598351/129447689-9a03eedc-2500-41dd-9521-388a63ee35c7.gif)
 
-ゲーム機能(10秒)
+ラップ・スプリットタイム、CSVダウンロード機能<br>
+![stopwatch_lap_split_csv](https://user-images.githubusercontent.com/65598351/129447726-2b415dd5-d508-4b67-9431-cc52c37ccde8.gif)
+
+ゲーム機能(10秒)<br>
 ![stopwatch_game](https://user-images.githubusercontent.com/65598351/129336518-20d00845-cb0b-459d-be52-82b4da9c7d19.gif)
 
-ゲーム機能(ランダム)
+ゲーム機能(ランダム)<br>
 ![stopwatch_game_random](https://user-images.githubusercontent.com/65598351/129337368-e4d3010b-ab5f-412f-af3a-1624859936e4.gif)

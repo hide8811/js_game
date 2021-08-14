@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <a class="back_btn" href="../index.html">戻る</a>
+    <a class="back-btn" href="../index.html">戻る</a>
 
     <div class="header">
       <div class="mode">
@@ -22,7 +22,7 @@
         <p id="mode-game" class="mode-game off-color">Stop Game</p>
       </div>
 
-      <div id="target" class="target hide-content">
+      <div id="target" class="target invisible">
         <div id="target-ten" class="target-ten on-color">10.<span class="target-ten-milliseconds">000</span></div>
 
         <div id="target-change-btn" class="target-change-btn">
@@ -43,16 +43,23 @@
     <div class="btn-area">
       <div id="left-btn" class="left-btn">
         <button id="start" class="start btn">START</button>
-        <button id="stop" class="stop btn hide-btn">STOP</button>
-        <button id="restart" class="restart btn hide-btn">RESTART</button>
+        <button id="stop" class="stop btn hide">STOP</button>
+        <button id="restart" class="restart btn hide">RESTART</button>
       </div>
 
       <div id="right-btn" class="right-btn">
         <button id="reset" class="reset btn">RESET</button>
+        <button id="lap" class="lap btn hide">LAP</button>
       </div>
     </div>
 
-    <ul id="score" class="score hide-content"></ul>
+    <div class="bottom-display">
+      <ul id="score" class="hide"></ul>
+      <div id="record-title" class="record-title"><span class="lap-record">LAP</span><span class="split-record">SPLIT</span></div>
+      <ul id="record" class=""></ul>
+    </div>
+
+    <button id="download-csv" class="download-csv">Download CSV</button>
 
     <script type="text/javascript" src="script.js"></script>
   </body>

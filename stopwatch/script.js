@@ -12,16 +12,22 @@ const startBtn = document.getElementById('start');
 const stopBtn = document.getElementById('stop');
 const restartBtn = document.getElementById('restart');
 const resetBtn = document.getElementById('reset');
+const lapBtn = document.getElementById('lap');
 const scoreArea = document.getElementById('score');
+const recordTitle = document.getElementById('record-title');
+const recordArea = document.getElementById('record');
+const downloadCsvBtn = document.getElementById('download-csv');
 
 let intervalTimer;
-let tmpTime;
-let tmpSignDiff = { sign: '+', time: '0' };
+let nowTime;
+let signDiff = { sign: '+', time: '0' };
+let lastTime = 0;
 let status = 'zero';
 let mode = 'stopwatch';
 let targetStatus = 'ten';
 let target = 10000;
-let scores = []; // { target: target, time: tmpTime, diff: tmpSignDiff }
+let scores = []; // { target: target, time: nowTime, diff: signDiff }
+let record = [];
 
 // 参考: https://developer.mozilla.org/ja/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
 function storageAvailable() {
@@ -76,27 +82,37 @@ const createTimeHash = (num) => {
 };
 
 const changeToStartBtn = () => {
-  stopBtn.classList.add('hide-btn');
-  restartBtn.classList.add('hide-btn');
-  startBtn.classList.remove('hide-btn');
+  stopBtn.classList.add('hide');
+  restartBtn.classList.add('hide');
+  startBtn.classList.remove('hide');
 };
 
 const changeToStopBtn = () => {
-  startBtn.classList.add('hide-btn');
-  restartBtn.classList.add('hide-btn');
-  stopBtn.classList.remove('hide-btn');
+  startBtn.classList.add('hide');
+  restartBtn.classList.add('hide');
+  stopBtn.classList.remove('hide');
 };
 
 const changeToRestartBtn = () => {
-  stopBtn.classList.add('hide-btn');
-  restartBtn.classList.remove('hide-btn');
+  stopBtn.classList.add('hide');
+  restartBtn.classList.remove('hide');
+};
+
+const changeToResetBtn = () => {
+  lapBtn.classList.add('hide');
+  resetBtn.classList.remove('hide');
+};
+
+const changeToLapBtn = () => {
+  resetBtn.classList.add('hide');
+  lapBtn.classList.remove('hide');
 };
 
 const timeDisplay = (startTime) => {
-  const nowTime = new Date();
-  const elapsedTime = nowTime - startTime;
+  const currentTime = new Date();
+  const elapsedTime = currentTime - startTime;
 
-  tmpTime = elapsedTime;
+  nowTime = elapsedTime;
 
   const time = createTimeHash(elapsedTime);
 
@@ -104,10 +120,10 @@ const timeDisplay = (startTime) => {
 };
 
 const gameTimeDisplay = (startTime) => {
-  const nowTime = new Date();
-  let time = nowTime - startTime;
+  const currentTime = new Date();
+  let time = currentTime - startTime;
 
-  tmpTime = time;
+  nowTime = time;
 
   const milliseconds = time % 1000;
   const millisecondsString = '0'.repeat(3 - String(milliseconds).length) + milliseconds;
@@ -131,37 +147,35 @@ const diffTime = () => {
   let sign;
   let diff;
 
-  if (tmpTime === target) {
+  if (nowTime === target) {
     sign = '±';
     diff = 0;
-  } else if (tmpTime > target) {
+  } else if (nowTime > target) {
     sign = '+';
-    diff = tmpTime - target;
+    diff = nowTime - target;
   } else {
     sign = '-';
-    diff = target - tmpTime;
+    diff = target - nowTime;
   }
 
-  tmpSignDiff = { sign, time: diff };
+  signDiff = { sign, time: diff };
 
-  const time = createTimeHash(diff);
-
-  timeDiffArea.innerHTML = `${sign}${time.second}.<span class="diff-milliseconds">${time.milliseconds}</span>`;
+  return [sign, diff];
 };
 
 const addScore = () => {
   const li = document.createElement('li');
   li.className = 'score-item';
   const targetTime = createTimeHash(target);
-  const time = createTimeHash(tmpTime);
-  const timeDiff = createTimeHash(tmpSignDiff.time);
+  const time = createTimeHash(nowTime);
+  const timeDiff = createTimeHash(signDiff.time);
 
-  li.innerHTML = `<span class="score-target">${targetTime.second}.${targetTime.milliseconds}</span><span class="score-time">${time.second}.${time.milliseconds}</span><span class="score-diff">${tmpSignDiff.sign}${timeDiff.second}.${timeDiff.milliseconds}</span>`;
+  li.innerHTML = `<span class="score-target">${targetTime.second}.${targetTime.milliseconds}</span><span class="score-time">${time.second}.${time.milliseconds}</span><span class="score-diff">${signDiff.sign}${timeDiff.second}.${timeDiff.milliseconds}</span>`;
 
   scoreArea.insertBefore(li, scoreArea.firstChild);
 
   if (localStorageAvailable) {
-    scores.push({ target, time: tmpTime, diff: tmpSignDiff });
+    scores.push({ target, time: nowTime, diff: signDiff });
 
     if (scores.length > 100) {
       scores.shift();
@@ -172,12 +186,33 @@ const addScore = () => {
   }
 };
 
+const lapTimer = () => {
+  if (mode === 'stopwatch' && status === 'move') {
+    const lap = nowTime - lastTime;
+    const lapTime = createTimeHash(lap);
+    const splitTime = createTimeHash(nowTime);
+
+    const lapTimeStr = `${lapTime.hour}:${lapTime.minutes}:${lapTime.second}.${lapTime.milliseconds}`;
+    const splitTimeStr = `${splitTime.hour}:${splitTime.minutes}:${splitTime.second}.${splitTime.milliseconds}`;
+
+    const li = document.createElement('li');
+    li.className = 'record-item';
+    li.innerHTML = `<span class="lap-record">${lapTimeStr}</span><span class="split-record">${splitTimeStr}</span>`;
+
+    recordArea.appendChild(li);
+
+    record.push([lapTimeStr, splitTimeStr]);
+    lastTime = nowTime;
+  }
+};
+
 const startTimer = () => {
   if (status === 'zero') {
     const startTime = new Date();
 
     if (mode === 'stopwatch') {
       intervalTimer = setInterval(timeDisplay, 1, startTime);
+      changeToLapBtn();
     } else {
       timeDiffArea.innerHTML = '';
 
@@ -206,10 +241,14 @@ const stopTimer = () => {
     clearInterval(intervalTimer);
 
     if (mode === 'stopwatch') {
+      if (record.length > 0) lapTimer();
       changeToRestartBtn();
+      changeToResetBtn();
       status = 'stop';
     } else {
-      diffTime();
+      const [sign, diff] = diffTime();
+      const time = createTimeHash(diff);
+      timeDiffArea.innerHTML = `${sign}${time.second}.<span class="diff-milliseconds">${time.milliseconds}</span>`;
       display.style.transition = '';
       display.style.opacity = 1;
 
@@ -224,11 +263,12 @@ const stopTimer = () => {
 const restartTimer = () => {
   if (status === 'stop') {
     const startTime = new Date();
-    startTime.setMilliseconds(startTime.getMilliseconds() - tmpTime);
+    startTime.setMilliseconds(startTime.getMilliseconds() - nowTime);
 
     intervalTimer = setInterval(timeDisplay, 1, startTime);
 
     changeToStopBtn();
+    changeToLapBtn();
 
     status = 'move';
   }
@@ -240,6 +280,9 @@ const resetTimer = () => {
 
   if (mode === 'stopwatch') {
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
+    recordArea.innerHTML = '';
+    record = [];
+    lastTime = 0;
   } else {
     display.innerHTML = '00.<span class="milliseconds">000</span>';
     targetTimeDisplay.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
@@ -261,8 +304,12 @@ const changeStopwatchMode = () => {
 
     targetTimeDisplay.innerHTML = '';
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
-    targetChangeArea.classList.add('hide-content');
-    scoreArea.classList.add('hide-content');
+    targetChangeArea.classList.add('invisible');
+    scoreArea.classList.add('invisible');
+
+    scoreArea.classList.add('hide');
+    recordTitle.classList.remove('hide');
+    recordArea.classList.remove('hide');
 
     mode = 'stopwatch';
   }
@@ -278,8 +325,12 @@ const changeGameMode = () => {
 
     display.innerHTML = '00.<span class="milliseconds">000</span>';
     targetTimeDisplay.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
-    targetChangeArea.classList.remove('hide-content');
-    scoreArea.classList.remove('hide-content');
+    targetChangeArea.classList.remove('invisible');
+    scoreArea.classList.remove('invisible');
+
+    recordTitle.classList.add('hide');
+    recordArea.classList.add('hide');
+    scoreArea.classList.remove('hide');
 
     mode = 'game';
   }
@@ -323,6 +374,25 @@ const targetChange = () => {
   }
 };
 
+const downloadCSV = () => {
+  if (record.length > 0) {
+    const fileName = 'stopwatch.csv';
+    const header = ',Lap Time,Split Time\n';
+    const data = header + record.map((r, i) => `${i + 1},${r.join(',')}`).join('\n');
+
+    const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+    const blob = new Blob([bom, data], { type: 'text/csv' });
+
+    const download = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    download.href = url;
+    download.download = fileName;
+    download.click();
+
+    URL.revokeObjectURL(url);
+  }
+};
+
 modeChangeBtn.addEventListener('click', modeChange);
 modeStopwatchBtn.addEventListener('click', changeStopwatchMode);
 modeGameBtn.addEventListener('click', changeGameMode);
@@ -333,6 +403,8 @@ startBtn.addEventListener('mousedown', startTimer);
 stopBtn.addEventListener('mousedown', stopTimer);
 restartBtn.addEventListener('mousedown', restartTimer);
 resetBtn.addEventListener('mousedown', resetTimer);
+lapBtn.addEventListener('mousedown', lapTimer);
+downloadCsvBtn.addEventListener('click', downloadCSV);
 
 if (localStorageAvailable) {
   const dataJson = localStorage.getItem('stopwatchGameScore');

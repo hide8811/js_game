@@ -1,4 +1,8 @@
-.back_btn {
+ul {
+  padding: 0;
+}
+
+.back-btn {
   position: absolute;
   top: 3vh;
   left: 8vw;
@@ -13,7 +17,7 @@
   border-radius: 10px;
 }
 
-.back_btn:hover {
+.back-btn:hover {
   background-color: #d8e698;
 }
 
@@ -179,11 +183,15 @@
   background-color: #f2f2b0;
 }
 
-.hide-btn {
-  display: none;
+.lap {
+  background-color: #b44c97;
 }
 
-.score {
+.lap:hover {
+  background-color: #c0a2c7;
+}
+
+.bottom-display {
   width: 500px;
   height: 600px;
   padding: 10px 50px;
@@ -227,6 +235,51 @@
   text-align: end;
 }
 
-.hide-content {
+.record-item {
+  height: 50px;
+  margin: 0 auto 10px;
+  line-height: 50px;
+  list-style: none;
+  border-bottom: solid 4px #2c4f54;
+}
+
+.record-title {
+  border-bottom: double 6px #2c4f54;
+}
+
+.lap-record {
+  display: inline-block;
+  width: calc(100% / 2);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.split-record {
+  display: inline-block;
+  width: calc(100% / 2);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.download-csv {
+  display: block;
+  width: 200px;
+  height: 80px;
+  margin: 50px auto;
+  font-size: 1.5rem;
+  background-color: #88cb7f;
+  border-bottom: solid 4px #6b7b6e;
+  border-radius: 50px;
+}
+
+.download-csv:hover {
+  background-color: #d8e698;
+}
+
+.hide {
+  display: none;
+}
+
+.invisible {
   visibility: hidden;
 }
