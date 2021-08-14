@@ -12,16 +12,19 @@ const startBtn = document.getElementById('start');
 const stopBtn = document.getElementById('stop');
 const restartBtn = document.getElementById('restart');
 const resetBtn = document.getElementById('reset');
+const lapBtn = document.getElementById('lap');
 const scoreArea = document.getElementById('score');
+const recordArea = document.getElementById('record');
 
 let intervalTimer;
-let tmpTime;
-let tmpSignDiff = { sign: '+', time: '0' };
+let nowTime;
+let signDiff = { sign: '+', time: '0' };
+let lastTime = 0;
 let status = 'zero';
 let mode = 'stopwatch';
 let targetStatus = 'ten';
 let target = 10000;
-let scores = []; // { target: target, time: tmpTime, diff: tmpSignDiff }
+let scores = []; // { target: target, time: nowTime, diff: signDiff }
 
 // 参考: https://developer.mozilla.org/ja/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
 function storageAvailable() {
@@ -92,11 +95,14 @@ const changeToRestartBtn = () => {
   restartBtn.classList.remove('hide-btn');
 };
 
-const timeDisplay = (startTime) => {
-  const nowTime = new Date();
-  const elapsedTime = nowTime - startTime;
+const changeToLapBtn = () => {
+};
 
-  tmpTime = elapsedTime;
+const timeDisplay = (startTime) => {
+  const currentTime = new Date();
+  const elapsedTime = currentTime - startTime;
+
+  nowTime = elapsedTime;
 
   const time = createTimeHash(elapsedTime);
 
@@ -104,10 +110,10 @@ const timeDisplay = (startTime) => {
 };
 
 const gameTimeDisplay = (startTime) => {
-  const nowTime = new Date();
-  let time = nowTime - startTime;
+  const currentTime = new Date();
+  let time = currentTime - startTime;
 
-  tmpTime = time;
+  nowTime = time;
 
   const milliseconds = time % 1000;
   const millisecondsString = '0'.repeat(3 - String(milliseconds).length) + milliseconds;
@@ -131,37 +137,35 @@ const diffTime = () => {
   let sign;
   let diff;
 
-  if (tmpTime === target) {
+  if (nowTime === target) {
     sign = '±';
     diff = 0;
-  } else if (tmpTime > target) {
+  } else if (nowTime > target) {
     sign = '+';
-    diff = tmpTime - target;
+    diff = nowTime - target;
   } else {
     sign = '-';
-    diff = target - tmpTime;
+    diff = target - nowTime;
   }
 
-  tmpSignDiff = { sign, time: diff };
+  signDiff = { sign, time: diff };
 
-  const time = createTimeHash(diff);
-
-  timeDiffArea.innerHTML = `${sign}${time.second}.<span class="diff-milliseconds">${time.milliseconds}</span>`;
+  return [sign, diff];
 };
 
 const addScore = () => {
   const li = document.createElement('li');
   li.className = 'score-item';
   const targetTime = createTimeHash(target);
-  const time = createTimeHash(tmpTime);
-  const timeDiff = createTimeHash(tmpSignDiff.time);
+  const time = createTimeHash(nowTime);
+  const timeDiff = createTimeHash(signDiff.time);
 
-  li.innerHTML = `<span class="score-target">${targetTime.second}.${targetTime.milliseconds}</span><span class="score-time">${time.second}.${time.milliseconds}</span><span class="score-diff">${tmpSignDiff.sign}${timeDiff.second}.${timeDiff.milliseconds}</span>`;
+  li.innerHTML = `<span class="score-target">${targetTime.second}.${targetTime.milliseconds}</span><span class="score-time">${time.second}.${time.milliseconds}</span><span class="score-diff">${signDiff.sign}${timeDiff.second}.${timeDiff.milliseconds}</span>`;
 
   scoreArea.insertBefore(li, scoreArea.firstChild);
 
   if (localStorageAvailable) {
-    scores.push({ target, time: tmpTime, diff: tmpSignDiff });
+    scores.push({ target, time: nowTime, diff: signDiff });
 
     if (scores.length > 100) {
       scores.shift();
@@ -209,7 +213,9 @@ const stopTimer = () => {
       changeToRestartBtn();
       status = 'stop';
     } else {
-      diffTime();
+      const [sign, diff] = diffTime();
+      const time = createTimeHash(diff);
+      timeDiffArea.innerHTML = `${sign}${time.second}.<span class="diff-milliseconds">${time.milliseconds}</span>`;
       display.style.transition = '';
       display.style.opacity = 1;
 
@@ -224,7 +230,7 @@ const stopTimer = () => {
 const restartTimer = () => {
   if (status === 'stop') {
     const startTime = new Date();
-    startTime.setMilliseconds(startTime.getMilliseconds() - tmpTime);
+    startTime.setMilliseconds(startTime.getMilliseconds() - nowTime);
 
     intervalTimer = setInterval(timeDisplay, 1, startTime);
 
@@ -240,6 +246,7 @@ const resetTimer = () => {
 
   if (mode === 'stopwatch') {
     display.innerHTML = '00:00:00.<span class="milliseconds">000</span>';
+    lastTime = 0;
   } else {
     display.innerHTML = '00.<span class="milliseconds">000</span>';
     targetTimeDisplay.innerHTML = (targetStatus === 'ten') ? '10.<span class="target-milliseconds">000</span>' : '<span class="target-time-random">RANDOM</span>';
@@ -249,6 +256,22 @@ const resetTimer = () => {
   }
 
   status = 'zero';
+};
+
+const lapTimer = () => {
+  if (mode === 'stopwatch' && status === 'move') {
+    const lap = nowTime - lastTime;
+    const lapTime = createTimeHash(lap);
+    const splitTime = createTimeHash(nowTime);
+
+    const lapTimeStr = `${lapTime.hour}:${lapTime.minutes}:${lapTime.second}.${lapTime.milliseconds}`;
+    const splitTimeStr = `${splitTime.hour}:${splitTime.minutes}:${splitTime.second}.${splitTime.milliseconds}`;
+
+    console.log(lapTimeStr);
+    console.log(splitTimeStr);
+
+    lastTime = nowTime;
+  }
 };
 
 const changeStopwatchMode = () => {
@@ -333,6 +356,7 @@ startBtn.addEventListener('mousedown', startTimer);
 stopBtn.addEventListener('mousedown', stopTimer);
 restartBtn.addEventListener('mousedown', restartTimer);
 resetBtn.addEventListener('mousedown', resetTimer);
+lapBtn.addEventListener('mousedown', lapTimer);
 
 if (localStorageAvailable) {
   const dataJson = localStorage.getItem('stopwatchGameScore');
