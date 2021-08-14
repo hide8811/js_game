@@ -97,7 +97,14 @@ const changeToRestartBtn = () => {
   restartBtn.classList.remove('hide');
 };
 
+const changeToResetBtn = () => {
+  lapBtn.classList.add('hide');
+  resetBtn.classList.remove('hide');
+};
+
 const changeToLapBtn = () => {
+  resetBtn.classList.add('hide');
+  lapBtn.classList.remove('hide');
 };
 
 const timeDisplay = (startTime) => {
@@ -205,6 +212,7 @@ const startTimer = () => {
 
     if (mode === 'stopwatch') {
       intervalTimer = setInterval(timeDisplay, 1, startTime);
+      changeToLapBtn();
     } else {
       timeDiffArea.innerHTML = '';
 
@@ -235,6 +243,7 @@ const stopTimer = () => {
     if (mode === 'stopwatch') {
       if (record.length > 0) lapTimer();
       changeToRestartBtn();
+      changeToResetBtn();
       status = 'stop';
     } else {
       const [sign, diff] = diffTime();
@@ -259,6 +268,7 @@ const restartTimer = () => {
     intervalTimer = setInterval(timeDisplay, 1, startTime);
 
     changeToStopBtn();
+    changeToLapBtn();
 
     status = 'move';
   }

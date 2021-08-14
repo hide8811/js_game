@@ -179,6 +179,14 @@
   background-color: #f2f2b0;
 }
 
+.lap {
+  background-color: #b44c97;
+}
+
+.lap:hover {
+  background-color: #c0a2c7;
+}
+
 .bottom-display {
   width: 500px;
   height: 600px;
