@@ -310,6 +310,7 @@ const changeStopwatchMode = () => {
     scoreArea.classList.add('hide');
     recordTitle.classList.remove('hide');
     recordArea.classList.remove('hide');
+    downloadCsvBtn.classList.remove('hide');
 
     mode = 'stopwatch';
   }
@@ -330,6 +331,7 @@ const changeGameMode = () => {
 
     recordTitle.classList.add('hide');
     recordArea.classList.add('hide');
+    downloadCsvBtn.classList.add('hide');
     scoreArea.classList.remove('hide');
 
     mode = 'game';
